@@ -1,0 +1,4 @@
+# Project exclude paths
+/hrpc-client/target/
+/hrpc-core/target/
+/hrpc-server/target/
