@@ -18,10 +18,10 @@ import java.util.List;
 @Slf4j
 public class RpcResponseEncoder extends MessageToMessageEncoder<RpcResponse> {
     @Override
-    protected void encode(ChannelHandlerContext ctx, RpcResponse msg, List<Object> out) throws Exception {
+    protected void encode(ChannelHandlerContext ctx, RpcResponse response, List<Object> out) throws Exception {
 
         try {
-            byte[] bytes = ProtostuffUtil.serialize(msg);
+            byte[] bytes = ProtostuffUtil.serialize(response);
             ByteBuf buffer = ctx.alloc().buffer(bytes.length);
             buffer.writeBytes(bytes);
             out.add(buffer);

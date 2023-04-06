@@ -1,5 +1,10 @@
 package com.itheima.rpc.server.boot.netty;
 
+import com.itheima.rpc.netty.codec.FrameDecoder;
+import com.itheima.rpc.netty.codec.FrameEncoder;
+import com.itheima.rpc.netty.codec.RpcRequestDecoder;
+import com.itheima.rpc.netty.codec.RpcResponseEncoder;
+import com.itheima.rpc.netty.handler.RpcRequestHandler;
 import com.itheima.rpc.server.boot.RpcServer;
 import com.itheima.rpc.server.config.RpcServerConfiguration;
 import io.netty.bootstrap.ServerBootstrap;
@@ -34,6 +39,8 @@ public class NettyServer implements RpcServer {
         EventLoopGroup worker = new NioEventLoopGroup(0, new DefaultThreadFactory("worker"));
         UnorderedThreadPoolEventExecutor business = new UnorderedThreadPoolEventExecutor(NettyRuntime.availableProcessors() * 2, new DefaultThreadFactory("business"));
 
+        RpcRequestHandler rpcRequestHandler = new RpcRequestHandler();
+
         try {
             ServerBootstrap serverBootstrap = new ServerBootstrap();
             serverBootstrap.group(boss, worker)
@@ -46,9 +53,11 @@ public class NettyServer implements RpcServer {
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {
                             ChannelPipeline pipeline = ch.pipeline();
-
-
-                        }
+                            pipeline.addLast("logHandler",new LoggingHandler(LogLevel.INFO));
+                            pipeline.addLast("FrameEncoder",new FrameEncoder());
+                            pipeline.addLast("RpcResponseEncoder",new RpcResponseEncoder());
+                            pipeline.addLast("RpcRequestDecoder",new RpcRequestDecoder());
+                            pipeline.addLast(business,"RpcRequestHandler",rpcRequestHandler);                        }
                     });
             ChannelFuture future = serverBootstrap.bind(rpcServerConfiguration.getRpcPort()).sync();
             future.channel().closeFuture().sync();
