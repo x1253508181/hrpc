@@ -51,13 +51,14 @@ public class NettyServer implements RpcServer {
                     .childOption(ChannelOption.SO_KEEPALIVE, true)
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
-                        protected void initChannel(SocketChannel ch) throws Exception {
+                        protected void initChannel(SocketChannel ch) {
                             ChannelPipeline pipeline = ch.pipeline();
-                            pipeline.addLast("logHandler",new LoggingHandler(LogLevel.INFO));
-                            pipeline.addLast("FrameEncoder",new FrameEncoder());
-                            pipeline.addLast("RpcResponseEncoder",new RpcResponseEncoder());
-                            pipeline.addLast("RpcRequestDecoder",new RpcRequestDecoder());
-                            pipeline.addLast(business,"RpcRequestHandler",rpcRequestHandler);                        }
+                            pipeline.addLast("logHandler", new LoggingHandler(LogLevel.INFO));
+                            pipeline.addLast("FrameEncoder", new FrameEncoder());
+                            pipeline.addLast("RpcResponseEncoder", new RpcResponseEncoder());
+                            pipeline.addLast("RpcRequestDecoder", new RpcRequestDecoder());
+                            pipeline.addLast(business, "RpcRequestHandler", rpcRequestHandler);
+                        }
                     });
             ChannelFuture future = serverBootstrap.bind(rpcServerConfiguration.getRpcPort()).sync();
             future.channel().closeFuture().sync();
@@ -68,5 +69,5 @@ public class NettyServer implements RpcServer {
             worker.shutdownGracefully();
             boss.shutdownGracefully();
         }
-     }
+    }
 }

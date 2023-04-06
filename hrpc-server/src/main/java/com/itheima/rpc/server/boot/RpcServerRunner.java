@@ -15,6 +15,8 @@ public class RpcServerRunner {
 
     @Resource
     private RpcRegistry rpcRegistry;
+    @Resource
+    private RpcServer rpcServer;
 
     /**
      * 启动 rpc server
@@ -24,6 +26,7 @@ public class RpcServerRunner {
         rpcRegistry.serviceRegistry();
 
         //2、基于netty绑定端口，启动服务，监听连接，接受链接处理数据
+        rpcServer.start();
 
     }
 }
